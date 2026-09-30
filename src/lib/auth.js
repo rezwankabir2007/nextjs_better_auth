@@ -1,14 +1,60 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { Resend } from 'resend';
 
 const client = new MongoClient(process.env.BETTER_AUTH_DB_URL);
 const db = client.db("Better-auth-db");
 
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 export const auth = betterAuth({
     emailAndPassword: { 
-    enabled: true, 
+    enabled: true,
+    sendResetPassword:async({user, url, token}, request)=>{
+      void resend.emails.send({
+        from: 'Acme <onboarding@resend.dev>',
+          to:user.email,
+           subject: "Reset your password",
+        html: `
+        <h2>Reset your passsword</h2>
+        Click the link to reset your password: ${url}
+        <p> Ignore this email if you haven't requested a password reset.</p>
+        `,
+      })
+
+    } 
   }, 
+  emailVerification:{
+      sendVerificationEmail:async({user,url})=>{
+        void resend.emails.send({
+           from: 'Acme <onboarding@resend.dev>',
+          to:user.email,
+           subject: 'Reset your password',
+        html: `
+        <h2>Plase berify your email address</h2>
+        Click <a href="${url}">here</a> to reset your password.
+        `,
+     
+        })
+      },
+      sendOnSignUp:true,
+      autoSignInAfterVerification:true,
+      expiresIn:24*3600 //24 hours
+
+  },
+   socialProviders: {
+        google: { 
+            clientId: process.env.BETTER_AUTH_GOOGLE_CLIENT_ID, 
+            clientSecret: process.env.BETTER_AUTH_GOOGLE_SECRET, 
+        }, 
+        github:{
+          clientId: process.env.BETTER_AUTH_GITHUB_CLIENT_ID,
+          clientSecret:process.env.BETTER_AUTH_GITHUB_SECRIET
+        }
+    },
+
   database: mongodbAdapter(db, {
     // Optional: if you don't provide a client, database transactions won't be enabled.
     client

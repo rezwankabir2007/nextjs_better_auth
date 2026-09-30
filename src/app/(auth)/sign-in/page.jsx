@@ -3,6 +3,7 @@
 import { signIn } from "@/lib/auth-client";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
 import { Button, Description, FieldError, Form, Input, InputGroup, Label, TextField } from "@heroui/react";
+import Link from "next/link";
 
 import React, { useState } from 'react';
 
@@ -69,29 +70,7 @@ const SignInPage = () => {
                         </InputGroup.Suffix>
                     </InputGroup>
                 </TextField>
-                <TextField
-                    isRequired
-                    minLength={8}
-                    name="password"
-                    type="password"
-                    validate={(value) => {
-                        if (value.length < 8) {
-                            return "Password must be at least 8 characters";
-                        }
-                        if (!/[A-Z]/.test(value)) {
-                            return "Password must contain at least one uppercase letter";
-                        }
-                        if (!/[0-9]/.test(value)) {
-                            return "Password must contain at least one number";
-                        }
-                        return null;
-                    }}
-                >
-                    <Label>Password</Label>
-                    <Input placeholder="Enter your password" />
-                    <Description>Must be at least 8 characters with 1 uppercase and 1 number</Description>
-                    <FieldError />
-                </TextField>
+             
                 <div className="flex gap-2">
                     <Button type="submit">
                         {/* <Check /> */}
@@ -103,6 +82,10 @@ const SignInPage = () => {
                 </div>
             </Form>
 
+            <p className="mt-3">
+
+            <small>Forgot password? <Link href="/forgot-password" className="text-blue-400 underline">click here</Link> </small>
+            </p>
 
         </div>
     );
